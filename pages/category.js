@@ -2,23 +2,14 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import {Component} from "react";
-import { getAllList, getCategoryList, searchByKey } from '../api/blogServer'
+import { getCategoryList, getCategoryPageList } from '../api/blogServer'
 import CategoryList from '../components/CategoryList';
 import Nav from '../components/Nav';
-import SearchBar from '../components/SearchBar';
+
 export default class Home extends Component {
   static async getInitialProps({query}) {
-    let data
     const catedata = await getCategoryList()
-
-    if (!query.keyword) {
-      console.log(1);
-      data = await getAllList(0)
-    } else {
-      console.log(2);
-      data = await searchByKey(query.keyword)
-      data.Articles = data.Article
-    }
+    const data = await getCategoryPageList(query.id,0)
     console.log(catedata);
     return {
     	res: data,
@@ -37,7 +28,10 @@ export default class Home extends Component {
         <Nav catedata={this.props.catedata}></Nav>
         <main className={styles.main}>
           
-          <SearchBar className={styles.content}></SearchBar>
+          <h1 className={styles.title}>
+            Welcome to <a href="https://nextjs.org">Next.js!</a>
+          </h1>
+  
           <p className={styles.description}>
             热门搜索：{' '}
             <code className={styles.code}>量子计算、 shor算法、 薛定谔的猫</code>
@@ -45,7 +39,7 @@ export default class Home extends Component {
   
           <div className={styles.grid}>
             {
-              (this.props.res).Articles.map(it => {
+              (this.props.res).Article.map(it => {
                 return (<a className={styles.card} href={'/detail?id='+it._id}>
                   <h2>{it.title} &rarr;</h2>
                   <div>{it.introduce}</div>

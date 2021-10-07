@@ -2,23 +2,14 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import {Component} from "react";
-import { getAllList, getCategoryList, searchByKey } from '../api/blogServer'
+import { getCategoryList, articleDetail } from '../api/blogServer'
 import CategoryList from '../components/CategoryList';
 import Nav from '../components/Nav';
-import SearchBar from '../components/SearchBar';
+
 export default class Home extends Component {
   static async getInitialProps({query}) {
-    let data
     const catedata = await getCategoryList()
-
-    if (!query.keyword) {
-      console.log(1);
-      data = await getAllList(0)
-    } else {
-      console.log(2);
-      data = await searchByKey(query.keyword)
-      data.Articles = data.Article
-    }
+    const data = await articleDetail(query.id)
     console.log(catedata);
     return {
     	res: data,
@@ -35,25 +26,10 @@ export default class Home extends Component {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <Nav catedata={this.props.catedata}></Nav>
-        <main className={styles.main}>
+        <main className={styles.content}>
+          {this.props.res.articleDetails.articleContent}
           
-          <SearchBar className={styles.content}></SearchBar>
-          <p className={styles.description}>
-            热门搜索：{' '}
-            <code className={styles.code}>量子计算、 shor算法、 薛定谔的猫</code>
-          </p>
-  
-          <div className={styles.grid}>
-            {
-              (this.props.res).Articles.map(it => {
-                return (<a className={styles.card} href={'/detail?id='+it._id}>
-                  <h2>{it.title} &rarr;</h2>
-                  <div>{it.introduce}</div>
-                </a>)
-              })
-              /*(JSON.stringify(this.props.res))*/
-            }
-          </div>
+          
         </main>
   
         <footer className={styles.footer}>
